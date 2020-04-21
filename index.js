@@ -15,7 +15,7 @@ const { WelcomeBot } = require('./bots/welcomeBot');
 // Read botFilePath and botFileSecret from .env file
 const ENV_FILE = path.join(__dirname, '.env');
 require('dotenv').config({ path: ENV_FILE });
-
+MicrosoftAppCredentials.trustServiceUrl('https://skype.botframework.com/');
 // Create bot adapter.
 // See https://aka.ms/about-bot-adapter to learn more about bot adapter.
 const adapter = new BotFrameworkAdapter({
@@ -73,7 +73,7 @@ server.post('/api/messages', (req, res) => {
         await bot.run(context);
     });
 });
-MicrosoftAppCredentials.trustServiceUrl('https://skype.botframework.com/');
+
 const getBalance = async () => {
     try {
         return await axios.get('https://api.paystack.co/balance', {
