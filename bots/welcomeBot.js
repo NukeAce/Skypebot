@@ -8,7 +8,7 @@ const balance = require('../index.js');
 const CONVERSATION_DATA_PROPERTY = 'conversationData';
 var rTimeout = null;
 var nestedTimeout = null;
-
+const WELCOMED_USER = 'welcomedUserProperty';
 class WelcomeBot extends ActivityHandler {
     /**
      *
@@ -22,7 +22,7 @@ class WelcomeBot extends ActivityHandler {
         this.userState = userState;
         this.conversationReferences = conversationReferences;
         this.conversationDataAccessor = conversationState.createProperty(CONVERSATION_DATA_PROPERTY);
-
+        this.welcomedUserProperty = userState.createProperty(WELCOMED_USER);
         // The state management objects for the conversation and user state.
         this.conversationState = conversationState;
 
@@ -32,32 +32,51 @@ class WelcomeBot extends ActivityHandler {
         });
 
         this.onMessage(async (context, next) => { //  this is an event listener that fires when the user sends the bot a message
+            // Read UserState. If the 'DidBotWelcomedUser' does not exist (first time ever for a user)
+            // set the default to false.
             this.addConversationReference(context.activity);
-            const text = context.activity.text.toLowerCase();// this takes the message and  converts it to a lowercase string
-            // start here
-            switch (text) {
-            case 'hello':
-                await context.sendActivity('I will retrieve your balance from the Paystack API, to cancel at any point type \'no\'');
-                rTimeout = setTimeout(async function run() {
-                    await balance.retrieveBalance();
-                    nestedTimeout = setTimeout(run, 5000);
-                }, 5000);
-                break;
-            case 'hi':
-                await context.sendActivity(`You said "${ context.activity.text }"`);
-                break;
-            case 'no':
-                clearTimeout(nestedTimeout);
-                clearTimeout(rTimeout);
-                break;
-            case 'intro':
-            case 'help':
-                await this.sendIntroCard(context);
-                break;
-            default:
-                await context.sendActivity(`This is a simple Welcome Bot sample. You can say 'intro' to
-                                                    see the introduction card. If you are running this bot in the Bot
-                                                    Framework Emulator, press the 'Start Over' button to simulate user joining a bot or a channel`);
+            const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
+
+            // Your bot should proactively send a welcome message to a personal chat the first time
+            // (and only the first time) a user initiates a personal chat with your bot.
+            if (didBotWelcomedUser === false) {
+                // The channel should send the user name in the 'From' object
+                const userName = context.activity.from.name;
+                await context.sendActivity('Welcome to the Nag Bot. If you want to get nagged with your balance type \'hello\', if you want your balance alone type \'balance. For info type \'intro\'');
+                await context.sendActivity(`Welcome ${ userName }.`);
+
+                // Set the flag indicating the bot handled the user's first message.
+                await this.welcomedUserProperty.set(context, true);
+            } else {
+                // This example uses an exact match on user's input utterance.
+                // Consider using LUIS or QnA for Natural Language Processing.
+                const text = context.activity.text.toLowerCase();// this takes the message and  converts it to a lowercase string
+                // start here
+                switch (text) {
+                case 'hello':
+                    await context.sendActivity('I will retrieve your balance from the Paystack API, to cancel at any point type \'no\'');
+                    rTimeout = setTimeout(async function run() {
+                        await balance.retrieveBalance();
+                        nestedTimeout = setTimeout(run, 5000);
+                    }, 5000);
+                    break;
+                case 'hi':
+                    await context.sendActivity(`You said "${ context.activity.text }"`);
+                    break;
+                case 'no':
+                    clearTimeout(nestedTimeout);
+                    clearTimeout(rTimeout);
+                    await context.sendActivity('You have opted to stop receiving balance');
+                    break;
+                case 'intro':
+                case 'help':
+                    await this.sendIntroCard(context);
+                    break;
+                default:
+                    await context.sendActivity(`This is a simple Welcome Bot sample. You can say 'intro' or 'help' to
+                                                        see the introduction card. If you are running this bot in the Bot
+                                                        Framework Emulator, press the 'Start Over' button to simulate user joining a bot or a channel`);
+                }
             }
 
             // By calling next() you ensure that the next BotHandler is run.
