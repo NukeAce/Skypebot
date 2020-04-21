@@ -65,7 +65,6 @@ class WelcomeBot extends ActivityHandler {
             // By calling next() you ensure that the next BotHandler is run.
             await next();
         });
-
         // Sends welcome messages to conversation members when they join the conversation.
         // Messages are only sent to conversation members who aren't the bot.
         this.onMembersAdded(async (context, next) => {
@@ -75,7 +74,7 @@ class WelcomeBot extends ActivityHandler {
                 // Since the bot is the recipient for events from the channel,
                 // context.activity.membersAdded === context.activity.recipient.Id indicates the
                 // bot was added to the conversation, and the opposite indicates this is a user.
-                if (context.activity.membersAdded[idx].id !== context.activity.recipient.id) {
+                if (context.activity.membersAdded[idx].id === context.activity.recipient.id) {
                     await context.sendActivity('Welcome to the Nag Bot. If you want to get nagged with your balance type \'ok\', if you want your balance alone type \'balance. for info type \'info\'');
                 }
             }
