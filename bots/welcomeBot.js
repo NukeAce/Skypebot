@@ -28,6 +28,7 @@ class WelcomeBot extends ActivityHandler {
 
         this.onConversationUpdate(async (context, next) => {
             this.addConversationReference(context.activity);
+            await context.sendActivity('Welcome to the Nag Bot. If you want to get nagged with your balance type \'ok\', if you want your balance alone type \'balance. for info type \'info\'');
 
             await next();
         });
