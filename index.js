@@ -9,7 +9,7 @@ const axios = require('axios');
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const { BotFrameworkAdapter, UserState, ConversationState, MemoryStorage } = require('botbuilder');
-
+const { MicrosoftAppCredentials } = require('botframework-connector');
 const { WelcomeBot } = require('./bots/welcomeBot');
 
 // Read botFilePath and botFileSecret from .env file
@@ -107,6 +107,7 @@ const retrieveBalance = async () => {
     const balance = await getBalance();
     if (balance !== undefined && balance.data.message !== undefined) {
         for (const conversationReference of Object.values(conversationReferences)) {
+            MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
             await adapter.continueConversation(conversationReference, async turnContext => {
                 // If you encounter permission-related errors when sending this message, see
                 // https://aka.ms/BotTrustServiceUrl
@@ -115,6 +116,7 @@ const retrieveBalance = async () => {
         }
     } else {
         for (const conversationReference of Object.values(conversationReferences)) {
+            MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
             await adapter.continueConversation(conversationReference, async turnContext => {
                 // If you encounter permission-related errors when sending this message, see
                 // https://aka.ms/BotTrustServiceUrl
