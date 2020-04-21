@@ -49,7 +49,6 @@ adapter.onTurnError = async (context, error) => {
 // For local development, in-memory storage is used.
 // CAUTION: The Memory Storage used here is for local bot debugging only. When the bot
 // is restarted, anything stored in memory will be gone.
-MicrosoftAppCredentials.trustServiceUrl('https://smba.trafficmanager.net/apis/', new Date(8640000000000000));
 const memoryStorage = new MemoryStorage();
 const userState = new UserState(memoryStorage);
 const conversationState = new ConversationState(memoryStorage);
