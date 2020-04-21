@@ -28,8 +28,6 @@ class WelcomeBot extends ActivityHandler {
 
         this.onConversationUpdate(async (context, next) => {
             this.addConversationReference(context.activity);
-            await context.sendActivity('Welcome to the Nag Bot. If you want to get nagged with your balance type \'ok\', if you want your balance alone type \'balance. for info type \'info\'');
-
             await next();
         });
 
@@ -74,7 +72,7 @@ class WelcomeBot extends ActivityHandler {
                 // Since the bot is the recipient for events from the channel,
                 // context.activity.membersAdded === context.activity.recipient.Id indicates the
                 // bot was added to the conversation, and the opposite indicates this is a user.
-                if (context.activity.membersAdded[idx].id === context.activity.recipient.id) {
+                if (context.activity.membersAdded[idx].id !== context.activity.recipient.id) {
                     await context.sendActivity('Welcome to the Nag Bot. If you want to get nagged with your balance type \'ok\', if you want your balance alone type \'balance. for info type \'info\'');
                 }
             }

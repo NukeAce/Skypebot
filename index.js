@@ -66,13 +66,14 @@ server.listen(process.env.port || process.env.PORT || 3978, function() {
 });
 
 // Listen for incoming activities and route them to your bot main dialog.
+
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         // route to main dialog.
         await bot.run(context);
     });
 });
-
+MicrosoftAppCredentials.trustServiceUrl('https://skype.botframework.com/');
 const getBalance = async () => {
     try {
         return await axios.get('https://api.paystack.co/balance', {
