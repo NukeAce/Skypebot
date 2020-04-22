@@ -42,7 +42,7 @@ class WelcomeBot extends ActivityHandler {
             if (didBotWelcomedUser === false) {
                 // The channel should send the user name in the 'From' object
                 const userName = context.activity.from.name;
-                await context.sendActivity(`Welcome ${ userName }. Welcome to the Nag Bot. If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro'`);
+                await context.sendActivity(`Welcome ${ userName } to the Nag Bot. If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro'`);
 
                 // Set the flag indicating the bot handled the user's first message.
                 await this.welcomedUserProperty.set(context, true);
@@ -69,6 +69,7 @@ class WelcomeBot extends ActivityHandler {
                     await this.sendIntroCard(context);
                     break;
                 default:
+                    // eslint-disable-next-line quotes
                     await context.sendActivity(`'If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro' or 'help'`);
                 }
             }
