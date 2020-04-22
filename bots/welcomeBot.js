@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 
 // Import required Bot Framework classes.
-const { ActionTypes, ActivityHandler, CardFactory, TurnContext } = require('botbuilder');
-const balance = require('../index.js');
+// add CardFactory and ActionType for info cards
+
+const { ActivityHandler, TurnContext } = require('botbuilder');
+const nagMessage = require('../index.js');
 // Welcomed User property name
 const CONVERSATION_DATA_PROPERTY = 'conversationData';
 var rTimeout = null;
@@ -42,7 +44,7 @@ class WelcomeBot extends ActivityHandler {
             if (didBotWelcomedUser === false) {
                 // The channel should send the user name in the 'From' object
                 const userName = context.activity.from.name;
-                await context.sendActivity(`Welcome ${ userName } to the Nag Bot. If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro'`);
+                await context.sendActivity(`Welcome ${ userName } to the Nag Bot. If you want to get nagged with a message type 'start', if you want to stop receiving the message type 'stop'`);
 
                 // Set the flag indicating the bot handled the user's first message.
                 await this.welcomedUserProperty.set(context, true);
@@ -52,25 +54,21 @@ class WelcomeBot extends ActivityHandler {
                 const text = context.activity.text.toLowerCase();// this takes the message and  converts it to a lowercase string
                 // start here
                 switch (text) {
-                case 'hello':
-                    await context.sendActivity('I will retrieve your balance from the Paystack API, to cancel at any point type \'no\'');
+                case 'start':
+                    await context.sendActivity('I will start nagging you. To cancel at any point type \'stop\'');
                     rTimeout = setTimeout(async function run() {
-                        await balance.retrieveBalance();
+                        await nagMessage.nag();// change message at the bottom of index.js
                         nestedTimeout = setTimeout(run, 5000);
                     }, 5000);
                     break;
-                case 'no':
+                case 'stop':
                     clearTimeout(nestedTimeout);
                     clearTimeout(rTimeout);
-                    await context.sendActivity('You have opted to stop receiving balance');
-                    break;
-                case 'intro':
-                case 'help':
-                    await this.sendIntroCard(context);
+                    await context.sendActivity('I will leave you alone now. To resume getting nagged type start');
                     break;
                 default:
                     // eslint-disable-next-line quotes
-                    await context.sendActivity(`'If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro' or 'help'`);
+                    await context.sendActivity(`If you want to get nagged with a message type 'start', if you want to stop getting nagged type 'stop`);
                 }
             }
 
@@ -112,32 +110,32 @@ class WelcomeBot extends ActivityHandler {
         this.conversationReferences[conversationReference.conversation.id] = conversationReference;
     }
 
-    async sendIntroCard(context) {
-        const card = CardFactory.heroCard(
-            'Welcome to Nag Bot balance checker!',
-            'Welcome to Paystack Nagbot.',
-            ['https://aka.ms/bf-welcome-card-image'],
-            [
-                {
-                    type: ActionTypes.OpenUrl,
-                    title: 'Open your dashboard',
-                    value: 'https://dashboard.paystack.com'
-                },
-                {
-                    type: ActionTypes.OpenUrl,
-                    title: 'Ask a question on twitter',
-                    value: 'https://twitter.com/paystack'
-                },
-                {
-                    type: ActionTypes.OpenUrl,
-                    title: 'View docs',
-                    value: 'https://developers.paystack.co/reference'
-                }
-            ]
-        );
+    // async sendIntroCard(context) {
+    //     const card = CardFactory.heroCard(
+    //         'Welcome to Nag Bot balance checker!',
+    //         'Welcome to Paystack Nagbot.',
+    //         ['https://aka.ms/bf-welcome-card-image'],
+    //         [
+    //             {
+    //                 type: ActionTypes.OpenUrl,
+    //                 title: 'Open your dashboard',
+    //                 value: 'https://dashboard.paystack.com'
+    //             },
+    //             {
+    //                 type: ActionTypes.OpenUrl,
+    //                 title: 'Ask a question on twitter',
+    //                 value: 'https://twitter.com/paystack'
+    //             },
+    //             {
+    //                 type: ActionTypes.OpenUrl,
+    //                 title: 'View docs',
+    //                 value: 'https://developers.paystack.co/reference'
+    //             }
+    //         ]
+    //     );
 
-        await context.sendActivity({ attachments: [card] });
-    }
+    //     await context.sendActivity({ attachments: [card] });
+    // }
 }
 
 module.exports.WelcomeBot = WelcomeBot;
