@@ -59,9 +59,6 @@ class WelcomeBot extends ActivityHandler {
                         nestedTimeout = setTimeout(run, 5000);
                     }, 5000);
                     break;
-                case 'hi':
-                    await context.sendActivity(`You said "${ context.activity.text }"`);
-                    break;
                 case 'no':
                     clearTimeout(nestedTimeout);
                     clearTimeout(rTimeout);
@@ -72,9 +69,7 @@ class WelcomeBot extends ActivityHandler {
                     await this.sendIntroCard(context);
                     break;
                 default:
-                    await context.sendActivity(`This is a simple Welcome Bot sample. You can say 'intro' or 'help' to
-                                                        see the introduction card. If you are running this bot in the Bot
-                                                        Framework Emulator, press the 'Start Over' button to simulate user joining a bot or a channel`);
+                    await context.sendActivity(`'If you want to get nagged with your balance type 'hello', if you want your balance alone type 'balance'. For info type 'intro' or 'help'`);
                 }
             }
 
