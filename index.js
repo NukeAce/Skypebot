@@ -4,7 +4,7 @@
 // Import required packages
 const path = require('path');
 const restify = require('restify');
-const axios = require('axios');
+// const axios = require('axios');
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -73,58 +73,66 @@ server.post('/api/messages', (req, res) => {
         await bot.run(context);
     });
 });
-
-const getBalance = async () => {
-    try {
-        return await axios.get('https://api.paystack.co/balance', {
-            headers: {
-                Authorization: 'Bearer sk_test_ee6ffed0718d607063af1be81d911419bd4eb224'
-            }
+// Uncomment this to implement API calls
+// const getBalance = async () => {
+//     try {
+//         return await axios.get('https://api.paystack.co/balance', {
+//             headers: {
+//                 Authorization: 'Bearer sk_test_ee6ffed0718d607063af1be81d911419bd4eb224'
+//             }
+//         });
+//     } catch (error) {
+//         if (error.response) {
+//             /*
+//              * The request was made and the server responded with a
+//              * status code that falls out of the range of 2xx
+//              */
+//             console.log(error.response.data);
+//             console.log(error.response.status);
+//             console.log(error.response.headers);
+//         } else if (error.request) {
+//             /*
+//              * The request was made but no response was received, `error.request`
+//              * is an instance of XMLHttpRequest in the browser and an instance
+//              * of http.ClientRequest in Node.js
+//              */
+//             console.log(error.request);
+//         } else {
+//             // Something happened in setting up the request and triggered an Error
+//             console.log('Error', error.message);
+//         }
+//         console.error(error);
+//     }
+// };
+// const retrieveBalance = async () => {
+//     const balance = await getBalance();
+//     if (balance !== undefined && balance.data.message !== undefined) {
+//         for (const conversationReference of Object.values(conversationReferences)) {
+//             MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
+//             await adapter.continueConversation(conversationReference, async turnContext => {
+//                 // If you encounter permission-related errors when sending this message, see
+//                 // https://aka.ms/BotTrustServiceUrl
+//                 await turnContext.sendActivity(balance.data.message);
+//             });
+//         }
+//     } else {
+//         for (const conversationReference of Object.values(conversationReferences)) {
+//             MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
+//             await adapter.continueConversation(conversationReference, async turnContext => {
+//                 // If you encounter permission-related errors when sending this message, see
+//                 // https://aka.ms/BotTrustServiceUrl
+//                 await turnContext.sendActivity('Unable to retrieve message at this moment. Check your connection');
+//             });
+//         }
+//     }
+// };
+const nag = async () => {
+    const message = 'Nagging you';// change this to change nag message
+    for (const conversationReference of Object.values(conversationReferences)) {
+        MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
+        await adapter.continueConversation(conversationReference, async turnContext => {
+            await turnContext.sendActivity(message);
         });
-    } catch (error) {
-        if (error.response) {
-            /*
-             * The request was made and the server responded with a
-             * status code that falls out of the range of 2xx
-             */
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-        } else if (error.request) {
-            /*
-             * The request was made but no response was received, `error.request`
-             * is an instance of XMLHttpRequest in the browser and an instance
-             * of http.ClientRequest in Node.js
-             */
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request and triggered an Error
-            console.log('Error', error.message);
-        }
-        console.error(error);
     }
 };
-const retrieveBalance = async () => {
-    const balance = await getBalance();
-    if (balance !== undefined && balance.data.message !== undefined) {
-        for (const conversationReference of Object.values(conversationReferences)) {
-            MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
-            await adapter.continueConversation(conversationReference, async turnContext => {
-                // If you encounter permission-related errors when sending this message, see
-                // https://aka.ms/BotTrustServiceUrl
-                await turnContext.sendActivity(balance.data.message);
-            });
-        }
-    } else {
-        for (const conversationReference of Object.values(conversationReferences)) {
-            MicrosoftAppCredentials.trustServiceUrl(conversationReference.serviceUrl);
-            await adapter.continueConversation(conversationReference, async turnContext => {
-                // If you encounter permission-related errors when sending this message, see
-                // https://aka.ms/BotTrustServiceUrl
-                await turnContext.sendActivity('Unable to retrieve message at this moment. Check your connection');
-            });
-        }
-    }
-};
-
-module.exports.retrieveBalance = retrieveBalance;
+module.exports.nag = nag;
